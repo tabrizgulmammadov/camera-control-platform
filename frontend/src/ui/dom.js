@@ -31,8 +31,8 @@ export function buildLayout(app) {
   <header class="topbar">
     <div class="brand">
       <span class="brand-dot"></span>
-      <h1>Camera Checker</h1>
-      <span class="brand-sub">stream &amp; device test bench</span>
+      <h1>Camera Control Platform</h1>
+      <span class="brand-sub">camera operations workspace</span>
     </div>
     <span class="chip mono" title="Backend base URL">${escapeHtml(BACKEND_BASE.replace(/^https?:\/\//, ''))}</span>
   </header>

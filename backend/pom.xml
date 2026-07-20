@@ -14,8 +14,8 @@
   <groupId>com.cameracheck</groupId>
   <artifactId>camera-check-backend</artifactId>
   <version>0.1.0</version>
-  <name>camera-check-backend</name>
-  <description>Camera checker backend: ONVIF driver + RTSP-to-HLS streaming</description>
+  <name>camera-control-platform-backend</name>
+  <description>Camera control platform backend: ONVIF driver + RTSP-to-HLS streaming</description>
 
   <properties>
     <!-- Bump/lower here if the local JDK differs -->

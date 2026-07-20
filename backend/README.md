@@ -1,4 +1,4 @@
-# Camera Check Backend
+# Camera Control Platform Backend
 
 Spring Boot API for camera discovery, WebRTC playback, and PTZ control.
 

@@ -1,6 +1,6 @@
-# Camera Checker — Frontend
+# Camera Control Platform — Frontend
 
-Single-page workspace UI for checking RTSP / ONVIF / ISAPI cameras. Talks to the Spring Boot backend at `http://localhost:8080` (see `../API-CONTRACT.md`). Video playback prefers low-latency WebRTC (WHEP, when the backend runs the MediaMTX relay) and falls back to [hls.js](https://github.com/video-dev/hls.js).
+Single-page workspace UI for managing RTSP / ONVIF / ISAPI cameras. Talks to the Spring Boot backend at `http://localhost:8080` (see `../API-CONTRACT.md`). Video playback prefers low-latency WebRTC (WHEP, when the backend runs the MediaMTX relay) and falls back to [hls.js](https://github.com/video-dev/hls.js).
 
 ## Stack
 
