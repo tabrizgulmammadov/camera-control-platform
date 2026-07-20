@@ -29,8 +29,9 @@ public class MediaMtxRelay {
 
     private static final Logger log = LoggerFactory.getLogger(MediaMtxRelay.class);
     private static final Duration API_TIMEOUT = Duration.ofSeconds(3);
-    private static final Duration STARTUP_WAIT = Duration.ofSeconds(15);
+    private static final Duration STARTUP_WAIT = Duration.ofSeconds(45);
     private static final Duration DOCKER_RUN_TIMEOUT = Duration.ofMinutes(5);
+    private static final String API_PATH = "/v3/config/global/get";
 
     static final String DOCKER_IMAGE = "bluenviron/mediamtx:latest";
     static final String CONTAINER_NAME = "cameracheck-mediamtx";
@@ -60,8 +61,10 @@ public class MediaMtxRelay {
         try {
             String running = runDocker(Duration.ofSeconds(15),
                     "ps", "--filter", "name=" + CONTAINER_NAME, "--format", "{{.Names}}");
-            if (running != null && running.lines().anyMatch(CONTAINER_NAME::equals)) {
+            boolean alreadyRunning = running != null && running.lines().anyMatch(CONTAINER_NAME::equals);
+            if (alreadyRunning) {
                 log.info("Adopting already-running MediaMTX container '{}'.", CONTAINER_NAME);
+                dockerManaged = false;
             } else {
                 log.info("Starting MediaMTX container '{}' from {}...", CONTAINER_NAME, DOCKER_IMAGE);
                 String id = runDocker(DOCKER_RUN_TIMEOUT, dockerRunArgs());
@@ -69,13 +72,15 @@ public class MediaMtxRelay {
                     return false;
                 }
                 log.info("MediaMTX container started ({}).", id.trim());
+                dockerManaged = true;
             }
-            dockerManaged = true;
             available = waitForApi();
             if (!available) {
                 log.warn("MediaMTX API did not answer on 127.0.0.1:{} within {}s (docker logs {}).",
                         apiPort, STARTUP_WAIT.toSeconds(), CONTAINER_NAME);
-                stop();
+                if (dockerManaged) {
+                    stop();
+                }
                 return false;
             }
             log.info("MediaMTX up: WebRTC/WHEP on :{} and ICE on :{}.", webrtcPort, ICE_PORT);
@@ -150,18 +155,10 @@ public class MediaMtxRelay {
 
     private boolean waitForApi() {
         long deadline = System.nanoTime() + STARTUP_WAIT.toNanos();
+        URI apiUri = URI.create("http://127.0.0.1:" + apiPort + API_PATH);
         while (System.nanoTime() < deadline) {
-            try {
-                HttpResponse<String> response = http.send(apiRequest("GET", "/v3/config/global/get", null),
-                        HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() == 200) {
-                    return true;
-                }
-            } catch (IOException e) {
-                // Container is still starting.
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return false;
+            if (probeApi(http, apiUri, API_TIMEOUT)) {
+                return true;
             }
             try {
                 Thread.sleep(250);
@@ -173,6 +170,22 @@ public class MediaMtxRelay {
         return false;
     }
 
+    static boolean probeApi(HttpClient client, URI apiUri, Duration timeout) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder(apiUri)
+                    .timeout(timeout)
+                    .GET()
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.statusCode() == 200;
+        } catch (IOException e) {
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
     public boolean available() {
         return available;
     }
@@ -182,14 +195,18 @@ public class MediaMtxRelay {
         if (!available()) {
             return null;
         }
-        String json = "{\"source\":" + jsonString(credentialedRtspUrl)
-                + ",\"sourceOnDemand\":true,\"rtspTransport\":\"tcp\"}";
+        String pathName = pathName(streamId);
+        String json = "{"
+                + "\"source\":" + jsonString(credentialedRtspUrl) + ","
+                + "\"sourceOnDemand\":true,"
+                + "\"rtspTransport\":\"tcp\""
+                + "}";
         try {
             HttpResponse<String> response = http.send(
-                    apiRequest("POST", "/v3/config/paths/add/" + pathName(streamId), json),
+                    apiRequest("POST", "/v3/config/paths/add/" + pathName, json),
                     HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() / 100 != 2) {
-                log.warn("MediaMTX rejected path {} (HTTP {}: {}) for stream {}.", pathName(streamId),
+                log.warn("MediaMTX rejected path {} (HTTP {}: {}) for stream {}.", pathName,
                         response.statusCode(), StreamManager.maskCredentialsInText(response.body()), streamId);
                 return null;
             }

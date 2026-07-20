@@ -1,4 +1,4 @@
-package com.cameracheck;
+package com.cameracontrolplatform;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
