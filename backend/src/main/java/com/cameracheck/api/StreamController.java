@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.cameracheck.api.dto.StreamDetailsResponse;
 import com.cameracheck.api.dto.StreamStartRequest;
@@ -19,7 +18,6 @@ import com.cameracheck.domain.ErrorCode;
 import com.cameracheck.streaming.StreamManager;
 import com.cameracheck.streaming.StreamSession;
 
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/stream")
@@ -32,37 +30,30 @@ public class StreamController {
     }
 
     @PostMapping("/start")
-    public StreamStartResponse start(@RequestBody StreamStartRequest request, HttpServletRequest http) {
+    public StreamStartResponse start(@RequestBody StreamStartRequest request) {
         if (request == null || request.rtspUrl() == null || request.rtspUrl().isBlank()) {
             throw new CameraException(ErrorCode.BAD_REQUEST, "rtspUrl is required");
         }
         StreamSession session = streamManager.start(
                 request.rtspUrl(), request.username(), request.password());
 
-        String hlsUrl = UriComponentsBuilder.fromUriString(baseUrl(http))
-                .path("/hls/{id}/index.m3u8")
-                .buildAndExpand(session.streamId())
-                .toUriString();
-
         return new StreamStartResponse(
                 session.streamId(),
-                hlsUrl,
                 session.whepUrl(),
-                session.whepUrl() != null ? "WEBRTC" : "HLS",
+                "WEBRTC",
                 new StreamStartResponse.Details(session.rtspUrl(), session.startedAt().toString()));
     }
 
     @GetMapping("/{streamId}")
     public StreamDetailsResponse details(@PathVariable String streamId) {
         StreamSession session = streamManager.get(streamId);
-        boolean alive = session.ffmpegAlive();
+        boolean relayAvailable = streamManager.relayAvailable();
         return new StreamDetailsResponse(
                 session.streamId(),
-                alive,
+                relayAvailable,
                 session.rtspUrl(),
                 session.startedAt().toString(),
-                alive,
-                session.failureReason());
+                relayAvailable ? null : "MediaMTX Docker container is unavailable.");
     }
 
     @DeleteMapping("/{streamId}")
@@ -71,9 +62,4 @@ public class StreamController {
         streamManager.stop(streamId);
     }
 
-    private String baseUrl(HttpServletRequest http) {
-        String host = http.getServerName();
-        int port = http.getServerPort();
-        return http.getScheme() + "://" + host + (port == 80 || port == 443 ? "" : ":" + port);
-    }
 }

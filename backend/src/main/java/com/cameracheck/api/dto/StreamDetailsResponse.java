@@ -5,6 +5,5 @@ public record StreamDetailsResponse(
         boolean running,
         String rtspUrl,
         String startedAt,
-        boolean ffmpegAlive,
         String error) {
 }

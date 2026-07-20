@@ -1,45 +1,31 @@
-// Player + stream lifecycle: start/stop, playlist wait with health polling,
-// bounded hls.js retry, live health in the details panel.
-// The play/stop/waitForPlaylist/attachHls logic is carried over unchanged from
-// the pre-redesign main.js (well-tested) — only rendering hooks are new.
-import Hls from 'hls.js';
-import { startStream, stopStream, waitForPlaylist, getStreamDetails } from '../api.js';
+// WebRTC/WHEP-only player and stream lifecycle.
+import { startStream, stopStream, getStreamDetails } from '../api.js';
 import { state } from '../state.js';
 import { els, escapeHtml, fmtTime, encoderSummary } from './dom.js';
 import { showError, clearError } from './banner.js';
 import { highlightPlayingProfile } from './profiles.js';
 import { showPtzFor, hidePtz } from './ptz.js';
 
-const MAX_FATAL_RECOVERIES = 3;
 const HEALTH_POLL_MS = 5000;
 const WHEP_ICE_TIMEOUT_MS = 1000;
 const WHEP_FIRST_FRAME_TIMEOUT_MS = 4000;
 let healthTimer = null;
 
-// ---------- Status chip / overlay ----------
 function setStatus(text, cls) {
   els.playerStatus.textContent = text;
   els.playerStatus.className = `status-chip ${cls}`;
 }
 
 function setOverlay(text) {
-  if (text) {
-    els.overlay.textContent = text;
-    els.overlay.classList.remove('hidden');
-  } else {
-    els.overlay.classList.add('hidden');
-  }
+  els.overlay.textContent = text || '';
+  els.overlay.classList.toggle('hidden', !text);
 }
 
-// ---------- Teardown ----------
 function closePeer() {
   if (state.pc) {
-    try {
-      state.pc.close();
-    } catch (_) {}
+    try { state.pc.close(); } catch (_) {}
     state.pc = null;
   }
-  // Release the WHEP session on the relay (best effort, per the WHEP spec).
   const resource = state.active?.whepResource;
   if (resource) {
     state.active.whepResource = null;
@@ -50,10 +36,6 @@ function closePeer() {
 
 function destroyPlayer() {
   closePeer();
-  if (state.hls) {
-    state.hls.destroy();
-    state.hls = null;
-  }
   els.video.pause();
   els.video.removeAttribute('src');
   els.video.load();
@@ -61,7 +43,7 @@ function destroyPlayer() {
 
 export async function stopActiveStream() {
   stopHealthPoll();
-  await hidePtz(); // guarantees a final PTZ {0,0} if the camera is moving
+  await hidePtz();
   destroyPlayer();
   const active = state.active;
   state.active = null;
@@ -70,53 +52,36 @@ export async function stopActiveStream() {
   setStatus('Idle', 'idle');
   els.stopBtn.classList.add('hidden');
   if (active?.streamId) {
-    try {
-      await stopStream(active.streamId);
-    } catch (_) {
-      // Best effort — backend auto-reaps idle streams.
-    }
+    try { await stopStream(active.streamId); } catch (_) {}
   }
   highlightPlayingProfile(null);
 }
 
-// ---------- Live health polling (details panel) ----------
 function stopHealthPoll() {
-  if (healthTimer) {
-    clearInterval(healthTimer);
-    healthTimer = null;
-  }
+  if (healthTimer) clearInterval(healthTimer);
+  healthTimer = null;
 }
 
 function startHealthPoll(streamId) {
   stopHealthPoll();
   healthTimer = setInterval(async () => {
-    if (state.active?.streamId !== streamId) {
-      stopHealthPoll();
-      return;
-    }
+    if (state.active?.streamId !== streamId) return stopHealthPoll();
     try {
-      const h = await getStreamDetails(streamId);
+      const health = await getStreamDetails(streamId);
       if (state.active?.streamId !== streamId) return;
-      state.active.health = h;
+      state.active.health = health;
       renderDetails();
-      if (h.running === false) {
+      if (!health.running) {
         stopHealthPoll();
         setStatus('Stopped', 'error');
-        showError(new Error(`Stream stopped: ${h.error || 'the ffmpeg process exited.'}`));
+        showError(new Error(health.error || 'MediaMTX is unavailable.'));
       }
-    } catch (err) {
-      if (err?.status === 404 && state.active?.streamId === streamId) {
-        // Backend reaped the stream (idle >5 min) or restarted.
-        stopHealthPoll();
-        state.active.health = { running: false, ffmpegAlive: false, error: 'Stream no longer exists on the backend.' };
-        renderDetails();
-      }
-      // Other failures: best effort, keep polling.
+    } catch (_) {
+      // The next poll may recover after a transient backend request failure.
     }
   }, HEALTH_POLL_MS);
 }
 
-// ---------- WHEP (WebRTC-HTTP egress) client ----------
 function waitForIceGathering(pc, timeoutMs) {
   if (pc.iceGatheringState === 'complete') return Promise.resolve();
   return new Promise((resolve) => {
@@ -126,9 +91,7 @@ function waitForIceGathering(pc, timeoutMs) {
       pc.removeEventListener('icegatheringstatechange', check);
       resolve();
     }
-    function check() {
-      if (pc.iceGatheringState === 'complete') done();
-    }
+    function check() { if (pc.iceGatheringState === 'complete') done(); }
     pc.addEventListener('icegatheringstatechange', check);
   });
 }
@@ -136,18 +99,15 @@ function waitForIceGathering(pc, timeoutMs) {
 function waitForFirstFrame(videoEl, pc, timeoutMs) {
   return new Promise((resolve, reject) => {
     let settled = false;
-    const finish = (ok, err) => {
+    const finish = (ok, error) => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
       pc.removeEventListener('connectionstatechange', onState);
       videoEl.removeEventListener('loadeddata', onFrame);
-      ok ? resolve() : reject(err);
+      ok ? resolve() : reject(error);
     };
-    const timer = setTimeout(
-      () => finish(false, new Error(`no video frame within ${Math.round(timeoutMs / 1000)} s`)),
-      timeoutMs
-    );
+    const timer = setTimeout(() => finish(false, new Error('no video frame within 4 s')), timeoutMs);
     const onState = () => {
       if (['failed', 'closed'].includes(pc.connectionState)) {
         finish(false, new Error(`peer connection ${pc.connectionState}`));
@@ -163,235 +123,104 @@ function waitForFirstFrame(videoEl, pc, timeoutMs) {
   });
 }
 
-/**
- * Standard WHEP handshake: recvonly offer → POST application/sdp → answer.
- * Resolves { pc, resource } once the first video frame rendered; on any
- * failure the peer connection is closed and the error propagates (caller
- * falls back to HLS).
- */
 async function whepConnect(whepUrl, videoEl) {
   const pc = new RTCPeerConnection();
   try {
     const mediaStream = new MediaStream();
     pc.addTransceiver('video', { direction: 'recvonly' });
     pc.addTransceiver('audio', { direction: 'recvonly' });
-    pc.addEventListener('track', (evt) => {
-      mediaStream.addTrack(evt.track);
+    pc.addEventListener('track', (event) => {
+      mediaStream.addTrack(event.track);
       if (videoEl.srcObject !== mediaStream) {
         videoEl.srcObject = mediaStream;
         videoEl.play().catch(() => {});
       }
     });
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
+    await pc.setLocalDescription(await pc.createOffer());
     await waitForIceGathering(pc, WHEP_ICE_TIMEOUT_MS);
-    const res = await fetch(whepUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/sdp' },
-      body: pc.localDescription.sdp,
+    const response = await fetch(whepUrl, {
+      method: 'POST', headers: { 'Content-Type': 'application/sdp' }, body: pc.localDescription.sdp,
     });
-    if (!res.ok) throw new Error(`WHEP endpoint answered HTTP ${res.status}`);
-    const location = res.headers.get('Location');
-    const answerSdp = await res.text();
-    await pc.setRemoteDescription({ type: 'answer', sdp: answerSdp });
+    if (!response.ok) throw new Error(`WHEP endpoint answered HTTP ${response.status}`);
+    const location = response.headers.get('Location');
+    await pc.setRemoteDescription({ type: 'answer', sdp: await response.text() });
     await waitForFirstFrame(videoEl, pc, WHEP_FIRST_FRAME_TIMEOUT_MS);
     return { pc, resource: location ? new URL(location, whepUrl).toString() : null };
-  } catch (err) {
-    try {
-      pc.close();
-    } catch (_) {}
-    if (videoEl.srcObject) videoEl.srcObject = null;
-    throw err;
+  } catch (error) {
+    try { pc.close(); } catch (_) {}
+    videoEl.srcObject = null;
+    throw error;
   }
 }
 
-// ---------- hls.js attach (bounded fatal-error retry) ----------
-function attachHls(hlsUrl) {
-  if (Hls.isSupported()) {
-    const hls = new Hls({ liveDurationInfinity: true });
-    state.hls = hls;
-    let recoveries = 0;
-    hls.loadSource(hlsUrl);
-    hls.attachMedia(els.video);
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      els.video.play().catch(() => {});
-      setOverlay(null);
-      setStatus('Live · HLS', 'live');
-    });
-    hls.on(Hls.Events.FRAG_LOADED, () => {
-      recoveries = 0; // healthy again — reset the retry budget
-    });
-    hls.on(Hls.Events.ERROR, (_evt, data) => {
-      if (!data.fatal) return;
-      recoveries += 1;
-      if (recoveries > MAX_FATAL_RECOVERIES) {
-        // Do not retry forever (e.g. backend reaped the stream and the
-        // playlist now 404s) — surface the failure and tear down.
-        showError(new Error('Playback failed: the stream is no longer available.'));
-        stopActiveStream();
-        return;
-      }
-      if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-        hls.startLoad();
-      } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-        hls.recoverMediaError();
-      } else {
-        showError(new Error('Playback failed (fatal hls.js error).'));
-        stopActiveStream();
-      }
-    });
-  } else if (els.video.canPlayType('application/vnd.apple.mpegurl')) {
-    els.video.src = hlsUrl;
-    els.video.play().catch(() => {});
-    setOverlay(null);
-    setStatus('Live · HLS', 'live');
-  } else {
-    showError(new Error('HLS playback is not supported in this browser.'));
-  }
-}
-
-/**
- * Start playback of an RTSP url via the backend.
- * source: 'rtsp' | 'onvif'; profile: optional camera profile object.
- * Only one stream is active at a time; starting a new one stops the previous.
- */
 export async function play({ rtspUrl, username, password, source, profile }) {
   if (state.busy) return;
   state.busy = true;
   clearError();
   try {
-    // Only one active player at a time.
     await stopActiveStream();
-
-    setOverlay('Starting stream…');
-    setStatus('Starting…', 'busy');
-    const res = await startStream({ rtspUrl, username, password });
-
+    setOverlay('Starting WebRTC stream...');
+    setStatus('Starting...', 'busy');
+    const response = await startStream({ rtspUrl, username, password });
     state.active = {
-      streamId: res.streamId,
-      hlsUrl: res.hlsUrl,
-      whepUrl: res.whepUrl || null,
+      streamId: response.streamId,
+      whepUrl: response.whepUrl,
       whepResource: null,
-      transport: null, // set once playback is attached
-      transportNote: null, // fallback reason (shown in the details panel)
-      rtspUrl: res.details?.rtspUrl || rtspUrl,
-      startedAt: res.details?.startedAt || new Date().toISOString(),
-      source,
-      profile: profile || null,
-      health: null,
+      rtspUrl: response.details?.rtspUrl || rtspUrl,
+      startedAt: response.details?.startedAt || new Date().toISOString(),
+      source, profile: profile || null, health: null,
     };
-    renderDetails();
+    const { pc, resource } = await whepConnect(response.whepUrl, els.video);
+    if (state.active?.streamId !== response.streamId) {
+      try { pc.close(); } catch (_) {}
+      if (resource) fetch(resource, { method: 'DELETE' }).catch(() => {});
+      return;
+    }
+    state.pc = pc;
+    state.active.whepResource = resource;
+    setOverlay(null);
+    setStatus('Live - WebRTC', 'live');
     els.stopBtn.classList.remove('hidden');
     highlightPlayingProfile(profile?.token || null);
-
-    // ---- WebRTC first (low latency) when the backend advertises a WHEP url ----
-    let attached = false;
-    if (res.whepUrl) {
-      setOverlay('Connecting WebRTC…');
-      try {
-        const { pc, resource } = await whepConnect(res.whepUrl, els.video);
-        if (state.active?.streamId !== res.streamId) {
-          // User stopped/restarted during the handshake.
-          try { pc.close(); } catch (_) {}
-          if (resource) fetch(resource, { method: 'DELETE' }).catch(() => {});
-          return;
-        }
-        state.pc = pc;
-        state.active.whepResource = resource;
-        state.active.transport = 'WEBRTC';
-        setOverlay(null);
-        setStatus('Live · WebRTC', 'live');
-        attached = true;
-      } catch (err) {
-        if (state.active?.streamId !== res.streamId) return;
-        state.active.transportNote = `WebRTC (WHEP) failed: ${err?.message || err} — fell back to HLS.`;
-      }
-    }
-
-    // ---- HLS path (primary without MediaMTX, fallback otherwise) ----
-    if (!attached) {
-      state.active.transport = 'HLS';
-      setOverlay('Waiting for HLS playlist…');
-      const { ready, error } = await waitForPlaylist(res.hlsUrl, {
-        // Abort polling early if the user stopped / restarted meanwhile.
-        isCancelled: () => state.active?.streamId !== res.streamId,
-        // Poll backend stream health so ffmpeg failures surface immediately.
-        streamId: res.streamId,
-      });
-      if (state.active?.streamId !== res.streamId) return;
-      if (!ready) {
-        showError(new Error(error
-          ? `Stream failed to start: ${error}`
-          : 'Stream did not become ready within 15 s. Check the RTSP URL / credentials.'));
-        await stopActiveStream();
-        return;
-      }
-      attachHls(res.hlsUrl);
-    }
-
     renderDetails();
-    startHealthPoll(res.streamId);
-
-    // PTZ overlay — only for streams started from a camera profile, where the
-    // device connection params are known (hidden for plain RTSP-URL streams).
+    startHealthPoll(response.streamId);
     if (source === 'onvif' && state.onvifConn && profile) {
       showPtzFor(state.onvifConn, profile);
       els.videoWrap.focus({ preventScroll: true });
     }
-  } catch (err) {
-    showError(err);
+  } catch (error) {
+    showError(error);
     setOverlay('No stream playing');
     setStatus('Idle', 'idle');
+    if (state.active?.streamId) await stopActiveStream();
   } finally {
     state.busy = false;
   }
 }
 
-// ---------- Details panel (incl. live health) ----------
 export function renderDetails() {
-  const a = state.active;
-  if (!a) {
+  const active = state.active;
+  if (!active) {
     els.details.classList.add('hidden');
     els.details.innerHTML = '';
     return;
   }
   const rows = [];
-  if (a.profile) {
-    rows.push(['Profile', `${escapeHtml(a.profile.name)} <span class="dim">(${escapeHtml(a.profile.token)})</span>`]);
-    if (a.profile.videoEncoder) rows.push(['Encoder', encoderSummary(a.profile.videoEncoder)]);
+  if (active.profile) {
+    rows.push(['Profile', `${escapeHtml(active.profile.name)} <span class="dim">(${escapeHtml(active.profile.token)})</span>`]);
+    if (active.profile.videoEncoder) rows.push(['Encoder', encoderSummary(active.profile.videoEncoder)]);
   }
-  rows.push(['Stream ID', `<span class="mono">${escapeHtml(a.streamId)}</span>`]);
-  if (a.transport) {
-    rows.push(['Transport', a.transport === 'WEBRTC'
-      ? '<span class="transport webrtc">WEBRTC</span> <span class="dim">low-latency (WHEP)</span>'
-      : '<span class="transport hls">HLS</span>']);
+  rows.push(['Stream ID', `<span class="mono">${escapeHtml(active.streamId)}</span>`]);
+  rows.push(['Transport', '<span class="transport webrtc">WEBRTC</span> <span class="dim">WHEP</span>']);
+  rows.push(['RTSP URL', `<span class="mono">${escapeHtml(active.rtspUrl)}</span>`]);
+  rows.push(['WHEP URL', `<span class="mono">${escapeHtml(active.whepUrl)}</span>`]);
+  rows.push(['Started', escapeHtml(fmtTime(active.startedAt))]);
+  if (active.health) {
+    rows.push(['Health', active.health.running
+      ? '<span class="health ok"><span class="dot"></span>MediaMTX available</span>'
+      : `<span class="health bad"><span class="dot"></span>${escapeHtml(active.health.error || 'Unavailable')}</span>`]);
   }
-  if (a.transportNote) {
-    rows.push(['Fallback', `<span class="dim">${escapeHtml(a.transportNote)}</span>`]);
-  }
-  rows.push(['RTSP URL', `<span class="mono">${escapeHtml(a.rtspUrl)}</span>`]);
-  if (a.transport === 'WEBRTC' && a.whepUrl) {
-    rows.push(['WHEP URL', `<span class="mono">${escapeHtml(a.whepUrl)}</span>`]);
-  }
-  rows.push(['HLS URL', `<span class="mono">${escapeHtml(a.hlsUrl)}</span>`]);
-  rows.push(['Started', escapeHtml(fmtTime(a.startedAt))]);
-
-  const h = a.health;
-  if (h) {
-    const ok = h.running !== false && h.ffmpegAlive !== false;
-    rows.push(['Health', ok
-      ? '<span class="health ok"><span class="dot"></span>Running — ffmpeg alive</span>'
-      : '<span class="health bad"><span class="dot"></span>Stopped</span>']);
-    if (!ok && h.error) {
-      rows.push(['Error', `<span class="health-error mono">${escapeHtml(h.error)}</span>`]);
-    }
-  }
-
-  els.details.innerHTML = `
-    <h3>Stream details</h3>
-    <table class="kv">
-      ${rows.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}
-    </table>`;
+  els.details.innerHTML = `<h3>Stream details</h3><table class="kv">${rows.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</table>`;
   els.details.classList.remove('hidden');
 }
 
