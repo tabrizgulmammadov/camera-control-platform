@@ -1,4 +1,4 @@
-# Local assistant and editor configuration (may contain credentials or machine paths)
+# Local assistant and editor configuration
 .claude/
 .idea/
 .vscode/
@@ -16,11 +16,8 @@ frontend/.env
 frontend/.env.*
 !frontend/.env.example
 
-# Downloaded local tools. Keep only the reproducible MediaMTX configuration.
-.tools/*
-!.tools/mediamtx/
-.tools/mediamtx/*
-!.tools/mediamtx/mediamtx.yml
+# Downloaded local tools
+.tools/
 
 # Logs, temporary files, and OS metadata
 *.log
