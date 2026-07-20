@@ -8,15 +8,22 @@ Spring Boot API for camera discovery, WebRTC playback, and PTZ control.
 - Docker Desktop, running with the Linux container engine available.
 - No Maven installation is required; the Maven Wrapper is included.
 
-The backend starts the official `bluenviron/mediamtx:latest` image as the
-`cameracheck-mediamtx` container. MediaMTX is Docker-only: there is no bundled
-executable, ffmpeg process, or HLS fallback. If Docker is unavailable,
+The backend expects the official `bluenviron/mediamtx:latest` image to be running
+as the `cameracheck-mediamtx` container. MediaMTX is Docker-only: there is no
+bundled executable, ffmpeg process, or HLS fallback. If Docker is unavailable,
 `POST /api/stream/start` returns `STREAM_ERROR` until Docker Desktop is running.
 
-Verify Docker before starting the backend:
+Start MediaMTX with Docker Compose from the repository root:
+
+```powershell
+docker compose up -d mediamtx
+```
+
+Verify Docker and the container before starting the backend:
 
 ```powershell
 docker info
+docker compose ps
 ```
 
 ## Run

@@ -1,11 +1,11 @@
-package com.cameracheck.driver.hikvision;
+package com.cameracontrolplatform.driver.hikvision;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cameracheck.domain.CameraConnection;
-import com.cameracheck.domain.CameraDriver;
-import com.cameracheck.domain.CameraEndpoint;
+import com.cameracontrolplatform.domain.CameraConnection;
+import com.cameracontrolplatform.domain.CameraDriver;
+import com.cameracontrolplatform.domain.CameraEndpoint;
 
 /**
  * Hikvision native driver: ISAPI REST/XML over HTTP with digest auth.

@@ -1,4 +1,4 @@
-package com.cameracheck.api;
+package com.cameracontrolplatform.api;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import com.cameracheck.api.dto.ErrorResponse;
-import com.cameracheck.domain.CameraException;
-import com.cameracheck.domain.ErrorCode;
+import com.cameracontrolplatform.api.dto.ErrorResponse;
+import com.cameracontrolplatform.domain.CameraException;
+import com.cameracontrolplatform.domain.ErrorCode;
 
 /** Maps every failure to the contract's error envelope { code, message }. */
 @RestControllerAdvice

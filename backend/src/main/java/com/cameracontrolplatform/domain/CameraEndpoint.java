@@ -1,4 +1,4 @@
-package com.cameracheck.domain;
+package com.cameracontrolplatform.domain;
 
 /**
  * Network address + credentials for a camera, protocol-agnostic.

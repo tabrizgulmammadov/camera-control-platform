@@ -1,4 +1,4 @@
-package com.cameracheck.api;
+package com.cameracontrolplatform.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -15,16 +15,16 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.cameracheck.domain.AudioEncoderConfig;
-import com.cameracheck.domain.CameraConnection;
-import com.cameracheck.domain.CameraDriver;
-import com.cameracheck.domain.CameraDriverDescriptor;
-import com.cameracheck.domain.CameraDriverRegistry;
-import com.cameracheck.domain.CameraEndpoint;
-import com.cameracheck.domain.DeviceInformation;
-import com.cameracheck.domain.MediaProfile;
-import com.cameracheck.domain.StreamType;
-import com.cameracheck.domain.VideoEncoderConfig;
+import com.cameracontrolplatform.domain.AudioEncoderConfig;
+import com.cameracontrolplatform.domain.CameraConnection;
+import com.cameracontrolplatform.domain.CameraDriver;
+import com.cameracontrolplatform.domain.CameraDriverDescriptor;
+import com.cameracontrolplatform.domain.CameraDriverRegistry;
+import com.cameracontrolplatform.domain.CameraEndpoint;
+import com.cameracontrolplatform.domain.DeviceInformation;
+import com.cameracontrolplatform.domain.MediaProfile;
+import com.cameracontrolplatform.domain.StreamType;
+import com.cameracontrolplatform.domain.VideoEncoderConfig;
 
 /**
  * Contract tests for GET /api/camera/drivers and POST /api/camera/profiles:

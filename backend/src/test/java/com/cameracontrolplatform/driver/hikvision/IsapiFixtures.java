@@ -1,4 +1,4 @@
-package com.cameracheck.driver.hikvision;
+package com.cameracontrolplatform.driver.hikvision;
 
 /** Canned Hikvision ISAPI XML replies, as real cameras produce them. */
 final class IsapiFixtures {

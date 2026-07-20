@@ -1,4 +1,4 @@
-package com.cameracheck.driver.onvif;
+package com.cameracontrolplatform.driver.onvif;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

@@ -1,4 +1,4 @@
-package com.cameracheck.driver.hikvision;
+package com.cameracontrolplatform.driver.hikvision;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -24,8 +24,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-import com.cameracheck.domain.CameraException;
-import com.cameracheck.domain.ErrorCode;
+import com.cameracontrolplatform.domain.CameraException;
+import com.cameracontrolplatform.domain.ErrorCode;
 
 /**
  * Minimal Hikvision ISAPI client: GET of XML resources over the JDK

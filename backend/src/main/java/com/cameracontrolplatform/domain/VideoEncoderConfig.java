@@ -1,4 +1,4 @@
-package com.cameracheck.domain;
+package com.cameracontrolplatform.domain;
 
 public record VideoEncoderConfig(
         String encoding,

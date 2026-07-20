@@ -1,4 +1,4 @@
-package com.cameracheck.domain;
+package com.cameracontrolplatform.domain;
 
 /**
  * Genetec-style protocol driver abstraction. Each supported camera protocol

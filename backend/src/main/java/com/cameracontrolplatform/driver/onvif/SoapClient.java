@@ -1,4 +1,4 @@
-package com.cameracheck.driver.onvif;
+package com.cameracontrolplatform.driver.onvif;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -20,8 +20,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-import com.cameracheck.domain.CameraException;
-import com.cameracheck.domain.ErrorCode;
+import com.cameracontrolplatform.domain.CameraException;
+import com.cameracontrolplatform.domain.ErrorCode;
 
 /**
  * Minimal SOAP 1.2 over HTTP client built on the JDK HttpClient. Envelopes are

@@ -1,4 +1,4 @@
-package com.cameracheck.api;
+package com.cameracontrolplatform.api;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

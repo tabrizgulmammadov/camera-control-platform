@@ -1,4 +1,4 @@
-package com.cameracheck.domain;
+package com.cameracontrolplatform.domain;
 
 public enum StreamType {
     MAIN,

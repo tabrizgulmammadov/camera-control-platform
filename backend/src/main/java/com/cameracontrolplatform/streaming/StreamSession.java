@@ -1,4 +1,4 @@
-package com.cameracheck.streaming;
+package com.cameracontrolplatform.streaming;
 
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicReference;

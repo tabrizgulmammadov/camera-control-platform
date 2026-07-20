@@ -1,4 +1,4 @@
-package com.cameracheck.api.dto;
+package com.cameracontrolplatform.api.dto;
 
 /**
  * Body of POST /api/camera/ptz/continuous. {@code pan}/{@code tilt} are speeds

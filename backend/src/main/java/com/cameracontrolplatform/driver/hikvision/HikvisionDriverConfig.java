@@ -1,11 +1,11 @@
-package com.cameracheck.driver.hikvision;
+package com.cameracontrolplatform.driver.hikvision;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
-import com.cameracheck.domain.CameraDriverDescriptor;
+import com.cameracontrolplatform.domain.CameraDriverDescriptor;
 
 /**
  * Registers the Hikvision ISAPI driver: lazy driver bean plus the

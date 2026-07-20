@@ -1,4 +1,4 @@
-package com.cameracheck.api.dto;
+package com.cameracontrolplatform.api.dto;
 
 /** Request shape of POST /api/camera/onvif/provision — mirrors API-CONTRACT.md. */
 public record OnvifProvisionRequest(

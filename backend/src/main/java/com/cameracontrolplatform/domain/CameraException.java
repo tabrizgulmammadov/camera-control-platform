@@ -1,4 +1,4 @@
-package com.cameracheck.domain;
+package com.cameracontrolplatform.domain;
 
 /** Domain exception carrying a contract error code. */
 public class CameraException extends RuntimeException {

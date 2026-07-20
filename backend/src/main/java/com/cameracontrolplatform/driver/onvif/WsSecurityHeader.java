@@ -1,4 +1,4 @@
-package com.cameracheck.driver.onvif;
+package com.cameracontrolplatform.driver.onvif;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

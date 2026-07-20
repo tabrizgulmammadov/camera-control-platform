@@ -1,4 +1,4 @@
-package com.cameracheck.driver.hikvision;
+package com.cameracontrolplatform.driver.hikvision;
 
 import java.io.StringWriter;
 import java.util.List;
@@ -13,14 +13,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.cameracheck.domain.CameraConnection;
-import com.cameracheck.domain.CameraEndpoint;
-import com.cameracheck.domain.CameraException;
-import com.cameracheck.domain.DeviceInformation;
-import com.cameracheck.domain.ErrorCode;
-import com.cameracheck.domain.MediaProfile;
-import com.cameracheck.domain.OnvifProvisioning;
-import com.cameracheck.domain.PtzControl;
+import com.cameracontrolplatform.domain.CameraConnection;
+import com.cameracontrolplatform.domain.CameraEndpoint;
+import com.cameracontrolplatform.domain.CameraException;
+import com.cameracontrolplatform.domain.DeviceInformation;
+import com.cameracontrolplatform.domain.ErrorCode;
+import com.cameracontrolplatform.domain.MediaProfile;
+import com.cameracontrolplatform.domain.OnvifProvisioning;
+import com.cameracontrolplatform.domain.PtzControl;
 
 /**
  * Hikvision ISAPI session: plain REST/XML against

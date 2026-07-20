@@ -1,4 +1,4 @@
-package com.cameracheck.api;
+package com.cameracontrolplatform.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cameracheck.api.dto.StreamDetailsResponse;
-import com.cameracheck.api.dto.StreamStartRequest;
-import com.cameracheck.api.dto.StreamStartResponse;
-import com.cameracheck.domain.CameraException;
-import com.cameracheck.domain.ErrorCode;
-import com.cameracheck.streaming.StreamManager;
-import com.cameracheck.streaming.StreamSession;
+import com.cameracontrolplatform.api.dto.StreamDetailsResponse;
+import com.cameracontrolplatform.api.dto.StreamStartRequest;
+import com.cameracontrolplatform.api.dto.StreamStartResponse;
+import com.cameracontrolplatform.domain.CameraException;
+import com.cameracontrolplatform.domain.ErrorCode;
+import com.cameracontrolplatform.streaming.StreamManager;
+import com.cameracontrolplatform.streaming.StreamSession;
 
 
 @RestController

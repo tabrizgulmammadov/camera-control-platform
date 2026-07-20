@@ -1,4 +1,4 @@
-package com.cameracheck.api.dto;
+package com.cameracontrolplatform.api.dto;
 
 public record StreamDetailsResponse(
         String streamId,

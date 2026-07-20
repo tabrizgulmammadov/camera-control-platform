@@ -1,19 +1,19 @@
-package com.cameracheck.api;
+package com.cameracontrolplatform.api;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cameracheck.api.dto.CameraProfilesResponse;
-import com.cameracheck.domain.CameraConnection;
-import com.cameracheck.domain.CameraDriverRegistry;
-import com.cameracheck.domain.CameraEndpoint;
-import com.cameracheck.domain.CameraException;
-import com.cameracheck.domain.DeviceInformation;
-import com.cameracheck.domain.ErrorCode;
-import com.cameracheck.domain.MediaProfile;
-import com.cameracheck.domain.OnvifProvisioning;
-import com.cameracheck.domain.PtzControl;
+import com.cameracontrolplatform.api.dto.CameraProfilesResponse;
+import com.cameracontrolplatform.domain.CameraConnection;
+import com.cameracontrolplatform.domain.CameraDriverRegistry;
+import com.cameracontrolplatform.domain.CameraEndpoint;
+import com.cameracontrolplatform.domain.CameraException;
+import com.cameracontrolplatform.domain.DeviceInformation;
+import com.cameracontrolplatform.domain.ErrorCode;
+import com.cameracontrolplatform.domain.MediaProfile;
+import com.cameracontrolplatform.domain.OnvifProvisioning;
+import com.cameracontrolplatform.domain.PtzControl;
 
 /**
  * Application service at the HTTP boundary: request validation plus the

@@ -1,4 +1,4 @@
-package com.cameracheck.streaming;
+package com.cameracontrolplatform.streaming;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.cameracheck.domain.CameraException;
-import com.cameracheck.domain.ErrorCode;
+import com.cameracontrolplatform.domain.CameraException;
+import com.cameracontrolplatform.domain.ErrorCode;
 
 class StreamManagerTest {
     private MediaMtxRelay relay;

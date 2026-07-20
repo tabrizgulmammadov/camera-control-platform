@@ -1,4 +1,4 @@
-package com.cameracheck.api;
+package com.cameracontrolplatform.api;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -6,16 +6,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cameracheck.api.dto.CameraProfilesRequest;
-import com.cameracheck.api.dto.CameraProfilesResponse;
-import com.cameracheck.api.dto.DriversResponse;
+import com.cameracontrolplatform.api.dto.CameraProfilesRequest;
+import com.cameracontrolplatform.api.dto.CameraProfilesResponse;
+import com.cameracontrolplatform.api.dto.DriversResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.cameracheck.api.dto.OnvifProvisionRequest;
-import com.cameracheck.api.dto.OnvifProvisionResponse;
-import com.cameracheck.api.dto.PtzContinuousRequest;
-import com.cameracheck.domain.CameraDriverRegistry;
+import com.cameracontrolplatform.api.dto.OnvifProvisionRequest;
+import com.cameracontrolplatform.api.dto.OnvifProvisionResponse;
+import com.cameracontrolplatform.api.dto.PtzContinuousRequest;
+import com.cameracontrolplatform.domain.CameraDriverRegistry;
 
 /**
  * Generic driver endpoints: driver discovery (never instantiates a driver —

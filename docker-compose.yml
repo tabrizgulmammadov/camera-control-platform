@@ -1,0 +1,27 @@
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: cameracheck-mediamtx
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9997:9997"
+      - "8889:8889"
+      - "8189:8189/tcp"
+      - "8189:8189/udp"
+    environment:
+      MTX_API: "yes"
+      MTX_APIADDRESS: ":9997"
+      MTX_WEBRTCADDRESS: ":8889"
+      MTX_WEBRTCALLOWORIGIN: "*"
+      MTX_WEBRTCADDITIONALHOSTS: "127.0.0.1"
+      MTX_WEBRTCLOCALTCPADDRESS: ":8189"
+      MTX_WEBRTCLOCALUDPADDRESS: ":8189"
+      MTX_RTSP: "no"
+      MTX_RTMP: "no"
+      MTX_HLS: "no"
+      MTX_SRT: "no"
+      MTX_AUTHINTERNALUSERS_0_USER: "any"
+      MTX_AUTHINTERNALUSERS_0_PERMISSIONS_0_ACTION: "publish"
+      MTX_AUTHINTERNALUSERS_0_PERMISSIONS_1_ACTION: "read"
+      MTX_AUTHINTERNALUSERS_0_PERMISSIONS_2_ACTION: "playback"
+      MTX_AUTHINTERNALUSERS_0_PERMISSIONS_3_ACTION: "api"

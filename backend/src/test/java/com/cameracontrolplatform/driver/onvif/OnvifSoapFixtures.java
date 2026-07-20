@@ -1,4 +1,4 @@
-package com.cameracheck.driver.onvif;
+package com.cameracontrolplatform.driver.onvif;
 
 /**
  * Realistic sample SOAP responses modeled on real Hikvision / Axis / Bosch

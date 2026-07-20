@@ -1,4 +1,4 @@
-package com.cameracheck.driver.hikvision;
+package com.cameracontrolplatform.driver.hikvision;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,13 +13,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.cameracheck.domain.AudioEncoderConfig;
-import com.cameracheck.domain.CameraException;
-import com.cameracheck.domain.DeviceInformation;
-import com.cameracheck.domain.ErrorCode;
-import com.cameracheck.domain.MediaProfile;
-import com.cameracheck.domain.StreamType;
-import com.cameracheck.domain.VideoEncoderConfig;
+import com.cameracontrolplatform.domain.AudioEncoderConfig;
+import com.cameracontrolplatform.domain.CameraException;
+import com.cameracontrolplatform.domain.DeviceInformation;
+import com.cameracontrolplatform.domain.ErrorCode;
+import com.cameracontrolplatform.domain.MediaProfile;
+import com.cameracontrolplatform.domain.StreamType;
+import com.cameracontrolplatform.domain.VideoEncoderConfig;
 
 /**
  * DOM extraction of Hikvision ISAPI XML payloads. ISAPI documents use a

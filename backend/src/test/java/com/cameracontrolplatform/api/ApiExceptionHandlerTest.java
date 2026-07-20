@@ -1,4 +1,4 @@
-package com.cameracheck.api;
+package com.cameracontrolplatform.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,11 +21,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import com.cameracheck.api.dto.ErrorResponse;
-import com.cameracheck.domain.CameraDriverRegistry;
-import com.cameracheck.domain.CameraException;
-import com.cameracheck.domain.ErrorCode;
-import com.cameracheck.streaming.StreamManager;
+import com.cameracontrolplatform.api.dto.ErrorResponse;
+import com.cameracontrolplatform.domain.CameraDriverRegistry;
+import com.cameracontrolplatform.domain.CameraException;
+import com.cameracontrolplatform.domain.ErrorCode;
+import com.cameracontrolplatform.streaming.StreamManager;
 
 /** Every error code must map to the contracted HTTP status and envelope shape. */
 class ApiExceptionHandlerTest {

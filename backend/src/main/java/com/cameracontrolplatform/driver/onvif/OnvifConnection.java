@@ -1,17 +1,17 @@
-package com.cameracheck.driver.onvif;
+package com.cameracontrolplatform.driver.onvif;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Document;
 
-import com.cameracheck.domain.CameraConnection;
-import com.cameracheck.domain.CameraEndpoint;
-import com.cameracheck.domain.CameraException;
-import com.cameracheck.domain.DeviceInformation;
-import com.cameracheck.domain.ErrorCode;
-import com.cameracheck.domain.MediaProfile;
-import com.cameracheck.domain.PtzControl;
+import com.cameracontrolplatform.domain.CameraConnection;
+import com.cameracontrolplatform.domain.CameraEndpoint;
+import com.cameracontrolplatform.domain.CameraException;
+import com.cameracontrolplatform.domain.DeviceInformation;
+import com.cameracontrolplatform.domain.ErrorCode;
+import com.cameracontrolplatform.domain.MediaProfile;
+import com.cameracontrolplatform.domain.PtzControl;
 
 /**
  * ONVIF session: talks SOAP 1.2 to the device service at
@@ -177,7 +177,7 @@ final class OnvifConnection implements CameraConnection, PtzControl {
                     </tds:GetCapabilities>""".formatted(DEVICE_NS));
             xaddr = OnvifParsers.mediaXAddr(caps);
         } catch (CameraException e) {
-            if (e.code() == com.cameracheck.domain.ErrorCode.ONVIF_AUTH_FAILED) {
+            if (e.code() == com.cameracontrolplatform.domain.ErrorCode.ONVIF_AUTH_FAILED) {
                 throw e;
             }
             // fall through to GetServices
@@ -190,7 +190,7 @@ final class OnvifConnection implements CameraConnection, PtzControl {
                         </tds:GetServices>""".formatted(DEVICE_NS));
                 xaddr = OnvifParsers.mediaXAddr(services);
             } catch (CameraException e) {
-                if (e.code() == com.cameracheck.domain.ErrorCode.ONVIF_AUTH_FAILED) {
+                if (e.code() == com.cameracontrolplatform.domain.ErrorCode.ONVIF_AUTH_FAILED) {
                     throw e;
                 }
             }

@@ -6,9 +6,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-public class CameraCheckApplication {
+public class CameraControlPlatformApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CameraCheckApplication.class, args);
+        SpringApplication.run(CameraControlPlatformApplication.class, args);
     }
 }

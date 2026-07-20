@@ -1,4 +1,4 @@
-package com.cameracheck.driver.onvif;
+package com.cameracontrolplatform.driver.onvif;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,13 +16,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.cameracheck.domain.CameraConnection;
-import com.cameracheck.domain.CameraEndpoint;
-import com.cameracheck.domain.CameraException;
-import com.cameracheck.domain.DeviceInformation;
-import com.cameracheck.domain.ErrorCode;
-import com.cameracheck.domain.MediaProfile;
-import com.cameracheck.domain.StreamType;
+import com.cameracontrolplatform.domain.CameraConnection;
+import com.cameracontrolplatform.domain.CameraEndpoint;
+import com.cameracontrolplatform.domain.CameraException;
+import com.cameracontrolplatform.domain.DeviceInformation;
+import com.cameracontrolplatform.domain.ErrorCode;
+import com.cameracontrolplatform.domain.MediaProfile;
+import com.cameracontrolplatform.domain.StreamType;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 

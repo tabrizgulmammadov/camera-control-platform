@@ -1,4 +1,4 @@
-package com.cameracheck.api.dto;
+package com.cameracontrolplatform.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

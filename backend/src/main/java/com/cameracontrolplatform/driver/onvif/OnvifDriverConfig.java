@@ -1,11 +1,11 @@
-package com.cameracheck.driver.onvif;
+package com.cameracontrolplatform.driver.onvif;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
-import com.cameracheck.domain.CameraDriverDescriptor;
+import com.cameracontrolplatform.domain.CameraDriverDescriptor;
 
 /**
  * Registers the ONVIF driver: the driver bean itself is {@code @Lazy} (only

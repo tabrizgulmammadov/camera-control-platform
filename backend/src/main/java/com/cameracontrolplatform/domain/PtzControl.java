@@ -1,4 +1,4 @@
-package com.cameracheck.domain;
+package com.cameracontrolplatform.domain;
 
 /**
  * Optional capability of a {@link CameraConnection}: pan/tilt control of a

@@ -1,4 +1,4 @@
-package com.cameracheck.domain;
+package com.cameracontrolplatform.domain;
 
 /** Error codes shared with the frontend — see API-CONTRACT.md. */
 public enum ErrorCode {

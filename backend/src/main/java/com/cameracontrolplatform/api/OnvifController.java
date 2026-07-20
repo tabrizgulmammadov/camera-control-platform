@@ -1,12 +1,12 @@
-package com.cameracheck.api;
+package com.cameracontrolplatform.api;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cameracheck.api.dto.CameraProfilesResponse;
-import com.cameracheck.api.dto.OnvifProfilesRequest;
+import com.cameracontrolplatform.api.dto.CameraProfilesResponse;
+import com.cameracontrolplatform.api.dto.OnvifProfilesRequest;
 
 /**
  * Legacy alias kept per API-CONTRACT.md: POST /api/onvif/profiles behaves

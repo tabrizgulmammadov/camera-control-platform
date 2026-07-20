@@ -1,11 +1,11 @@
-package com.cameracheck.api.dto;
+package com.cameracontrolplatform.api.dto;
 
 import java.util.List;
 
-import com.cameracheck.domain.AudioEncoderConfig;
-import com.cameracheck.domain.DeviceInformation;
-import com.cameracheck.domain.MediaProfile;
-import com.cameracheck.domain.VideoEncoderConfig;
+import com.cameracontrolplatform.domain.AudioEncoderConfig;
+import com.cameracontrolplatform.domain.DeviceInformation;
+import com.cameracontrolplatform.domain.MediaProfile;
+import com.cameracontrolplatform.domain.VideoEncoderConfig;
 
 /** Response shape of POST /api/camera/profiles (and the legacy /api/onvif/profiles alias) - mirrors API-CONTRACT.md. */
 public record CameraProfilesResponse(DeviceInfoDto deviceInfo, List<ProfileDto> profiles) {

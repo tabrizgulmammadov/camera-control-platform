@@ -1,4 +1,4 @@
-package com.cameracheck.domain;
+package com.cameracontrolplatform.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
-import com.cameracheck.driver.hikvision.HikvisionCameraDriver;
-import com.cameracheck.driver.hikvision.HikvisionDriverConfig;
-import com.cameracheck.driver.onvif.OnvifCameraDriver;
-import com.cameracheck.driver.onvif.OnvifDriverConfig;
+import com.cameracontrolplatform.driver.hikvision.HikvisionCameraDriver;
+import com.cameracontrolplatform.driver.hikvision.HikvisionDriverConfig;
+import com.cameracontrolplatform.driver.onvif.OnvifCameraDriver;
+import com.cameracontrolplatform.driver.onvif.OnvifDriverConfig;
 
 /**
  * Verifies the Spring wiring itself: driver beans are @Lazy, so context

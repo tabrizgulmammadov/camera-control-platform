@@ -1,4 +1,4 @@
-package com.cameracheck.driver.hikvision;
+package com.cameracontrolplatform.driver.hikvision;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

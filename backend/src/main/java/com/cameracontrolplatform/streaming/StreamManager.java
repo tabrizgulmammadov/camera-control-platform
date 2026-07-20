@@ -1,4 +1,4 @@
-package com.cameracheck.streaming;
+package com.cameracontrolplatform.streaming;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -11,8 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.cameracheck.domain.CameraException;
-import com.cameracheck.domain.ErrorCode;
+import com.cameracontrolplatform.domain.CameraException;
+import com.cameracontrolplatform.domain.ErrorCode;
 
 import jakarta.annotation.PreDestroy;
 

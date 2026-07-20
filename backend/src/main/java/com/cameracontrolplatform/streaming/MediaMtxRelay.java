@@ -1,4 +1,4 @@
-package com.cameracheck.streaming;
+package com.cameracontrolplatform.streaming;
 
 import java.io.IOException;
 import java.net.URI;
