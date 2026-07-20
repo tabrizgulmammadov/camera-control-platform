@@ -1,0 +1,29 @@
+# Local assistant and editor configuration (may contain credentials or machine paths)
+.claude/
+.idea/
+.vscode/
+
+# Generated analysis output
+graphify-out/
+
+# Java build output
+backend/target/
+
+# Frontend dependencies and build output
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Downloaded local tools. Keep only the reproducible MediaMTX configuration.
+.tools/*
+!.tools/mediamtx/
+.tools/mediamtx/*
+!.tools/mediamtx/mediamtx.yml
+
+# Logs, temporary files, and OS metadata
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
