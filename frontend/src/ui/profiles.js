@@ -85,7 +85,6 @@ export function renderCameraResults() {
         rtspUrl: profile.rtspUri,
         username: state.onvifCreds?.username || undefined,
         password: state.onvifCreds?.password || undefined,
-        source: 'onvif',
         profile,
       });
     });

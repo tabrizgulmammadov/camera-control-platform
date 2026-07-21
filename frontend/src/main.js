@@ -1,12 +1,13 @@
-// App bootstrap & orchestration: mode switching, lazy driver discovery,
-// connection forms, and unload cleanup. UI pieces live in src/ui/*.js;
-// all backend calls go through src/api.js.
+// App bootstrap & orchestration: lazy driver discovery, the camera connection
+// form, and unload cleanup. UI pieces live in src/ui/*.js; all backend calls
+// go through src/api.js. Camera/ONVIF/ISAPI is the only source — there is no
+// plain-RTSP-URL mode.
 import './style.css';
 import { getDrivers, getCameraProfiles, BACKEND_BASE } from './api.js';
 import { state, FALLBACK_DRIVERS } from './state.js';
 import { initEls, els, escapeHtml } from './ui/dom.js';
 import { showError, clearError } from './ui/banner.js';
-import { initPlayer, play } from './ui/player.js';
+import { initPlayer } from './ui/player.js';
 import { initPtz, ptzEmergencyStop } from './ui/ptz.js';
 import { renderCameraResults, clearCameraResults } from './ui/profiles.js';
 import {
@@ -14,7 +15,6 @@ import {
   checkOnvifStatus,
   suggestProvision,
   clearProvisionSuggestion,
-  closeOnvifModal,
 } from './ui/provision.js';
 
 initEls(document.getElementById('app'));
@@ -40,25 +40,6 @@ function selectedDriver() {
 }
 
 initProvision({ connection: connectionParams, selectedDriver });
-
-// ---------- Mode switching (source selector in the connection card) ----------
-function setMode(mode) {
-  state.mode = mode;
-  els.tabRtsp.classList.toggle('active', mode === 'rtsp');
-  els.tabOnvif.classList.toggle('active', mode === 'onvif');
-  els.tabRtsp.setAttribute('aria-selected', String(mode === 'rtsp'));
-  els.tabOnvif.setAttribute('aria-selected', String(mode === 'onvif'));
-  els.rtspForm.classList.toggle('hidden', mode !== 'rtsp');
-  els.onvifForm.classList.toggle('hidden', mode !== 'onvif');
-  const camera = mode === 'onvif';
-  els.deviceCard.classList.toggle('hidden', !(camera && state.onvifResult));
-  els.profilesCard.classList.toggle('hidden', !(camera && state.onvifResult));
-  if (!camera) closeOnvifModal();
-  clearError();
-  if (camera) loadDrivers();
-}
-els.tabRtsp.addEventListener('click', () => setMode('rtsp'));
-els.tabOnvif.addEventListener('click', () => setMode('onvif'));
 
 // ---------- Driver list (lazy, with fallback for older backends) ----------
 async function loadDrivers() {
@@ -94,20 +75,7 @@ els.driverSelect.addEventListener('change', () => {
   clearProvisionSuggestion();
 });
 
-// ---------- RTSP mode ----------
-els.rtspForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const rtspUrl = els.$('rtsp-url').value.trim();
-  if (!rtspUrl) return;
-  play({
-    rtspUrl,
-    username: els.$('rtsp-user').value.trim() || undefined,
-    password: els.$('rtsp-pass').value || undefined,
-    source: 'rtsp',
-  });
-});
-
-// ---------- Camera mode: Get Profiles ----------
+// ---------- Get Profiles ----------
 els.onvifForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (state.busy) return;
@@ -153,4 +121,5 @@ window.addEventListener('beforeunload', () => {
   }
 });
 
-setMode('rtsp');
+clearError();
+loadDrivers();

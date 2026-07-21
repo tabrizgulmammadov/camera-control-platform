@@ -67,7 +67,9 @@ Example:
 
 7) POST /api/stream/start
 
-- Request: `StreamStartRequest` { rtspUrl, username, password }
+- Request: `StreamStartRequest` { rtspUrl, username, password }. `rtspUrl` is normally a profile's
+  `rtspUri` from endpoint 5 — there is no manual "enter an RTSP URL" entry point in the frontend;
+  profiles are only discovered through a driver.
 - Response: `StreamStartResponse` { streamId, whepUrl, transport = "WEBRTC", details: { rtspUrl, startedAt } }
 
 8) GET /api/stream/{streamId}

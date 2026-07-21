@@ -32,7 +32,7 @@ export function buildLayout(app) {
     <div class="brand">
       <span class="brand-dot"></span>
       <h1>Camera Control Platform</h1>
-      <span class="brand-sub">camera operations workspace</span>
+      <span class="brand-sub">ONVIF / manufacturer driver operations</span>
     </div>
     <span class="chip mono" title="Backend base URL">${escapeHtml(BACKEND_BASE.replace(/^https?:\/\//, ''))}</span>
   </header>
@@ -44,30 +44,10 @@ export function buildLayout(app) {
     <div class="col col-left">
       <section class="card" id="connection-card">
         <div class="card-head">
-          <h2>Connection</h2>
+          <h2>Camera Connection</h2>
         </div>
         <div class="card-body">
-          <div class="seg" role="tablist" aria-label="Source">
-            <button id="tab-rtsp" class="seg-btn active" role="tab" aria-selected="true">RTSP URL</button>
-            <button id="tab-onvif" class="seg-btn" role="tab" aria-selected="false">Camera (ONVIF / ISAPI)</button>
-          </div>
-
-          <form id="rtsp-form" class="form">
-            <label>RTSP URL
-              <input id="rtsp-url" type="text" placeholder="rtsp://192.168.1.64:554/Streaming/Channels/101" required autocomplete="off" spellcheck="false" />
-            </label>
-            <div class="row2">
-              <label>Username <span class="opt">(optional)</span>
-                <input id="rtsp-user" type="text" autocomplete="off" />
-              </label>
-              <label>Password <span class="opt">(optional)</span>
-                <input id="rtsp-pass" type="password" autocomplete="new-password" />
-              </label>
-            </div>
-            <button type="submit" class="btn primary" id="rtsp-play-btn">&#9654; Play</button>
-          </form>
-
-          <form id="onvif-form" class="form hidden">
+          <form id="onvif-form" class="form">
             <label>Manufacturer / Driver
               <select id="onvif-driver">
                 <option value="ONVIF">Generic ONVIF</option>
@@ -180,9 +160,6 @@ export function buildLayout(app) {
   const $ = (id) => document.getElementById(id);
   return {
     errorBanner: $('error-banner'),
-    tabRtsp: $('tab-rtsp'),
-    tabOnvif: $('tab-onvif'),
-    rtspForm: $('rtsp-form'),
     onvifForm: $('onvif-form'),
     driverSelect: $('onvif-driver'),
     driverWarn: $('driver-warn'),

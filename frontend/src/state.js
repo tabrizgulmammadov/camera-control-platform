@@ -1,7 +1,6 @@
 // Shared mutable app state (single source of truth across ui modules).
 export const state = {
-  mode: 'rtsp', // 'rtsp' | 'onvif'
-  active: null, // { streamId, whepUrl, whepResource, startedAt, rtspUrl, source, profile, health }
+  active: null, // { streamId, whepUrl, whepResource, startedAt, rtspUrl, profile, health }
   pc: null, // RTCPeerConnection while playing over WebRTC (WHEP)
   onvifResult: null, // { deviceInfo, profiles }
   onvifCreds: null, // { username, password } used for last profile fetch

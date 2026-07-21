@@ -153,7 +153,7 @@ async function whepConnect(whepUrl, videoEl) {
   }
 }
 
-export async function play({ rtspUrl, username, password, source, profile }) {
+export async function play({ rtspUrl, username, password, profile }) {
   if (state.busy) return;
   state.busy = true;
   clearError();
@@ -168,7 +168,7 @@ export async function play({ rtspUrl, username, password, source, profile }) {
       whepResource: null,
       rtspUrl: response.details?.rtspUrl || rtspUrl,
       startedAt: response.details?.startedAt || new Date().toISOString(),
-      source, profile: profile || null, health: null,
+      profile: profile || null, health: null,
     };
     const { pc, resource } = await whepConnect(response.whepUrl, els.video);
     if (state.active?.streamId !== response.streamId) {
@@ -184,7 +184,7 @@ export async function play({ rtspUrl, username, password, source, profile }) {
     highlightPlayingProfile(profile?.token || null);
     renderDetails();
     startHealthPoll(response.streamId);
-    if (source === 'onvif' && state.onvifConn && profile) {
+    if (state.onvifConn && profile) {
       showPtzFor(state.onvifConn, profile);
       els.videoWrap.focus({ preventScroll: true });
     }
