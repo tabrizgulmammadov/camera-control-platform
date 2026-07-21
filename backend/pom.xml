@@ -11,7 +11,7 @@
     <relativePath/>
   </parent>
 
-  <groupId>com.cameracheck</groupId>
+  <groupId>com.cameracontrolplatform</groupId>
   <artifactId>camera-check-backend</artifactId>
   <version>0.1.0</version>
   <name>camera-control-platform-backend</name>

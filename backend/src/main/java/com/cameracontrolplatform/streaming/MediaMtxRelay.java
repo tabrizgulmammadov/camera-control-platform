@@ -34,7 +34,7 @@ public class MediaMtxRelay {
     private static final String API_PATH = "/v3/config/global/get";
 
     static final String DOCKER_IMAGE = "bluenviron/mediamtx:latest";
-    static final String CONTAINER_NAME = "cameracheck-mediamtx";
+    static final String CONTAINER_NAME = "cameracontrolplatform-mediamtx";
     private static final int ICE_PORT = 8189;
 
     private final int apiPort;
@@ -43,8 +43,8 @@ public class MediaMtxRelay {
     private boolean dockerManaged;
     private volatile boolean available;
 
-    public MediaMtxRelay(@Value("${cameracheck.mediamtx.api-port:9997}") int apiPort,
-            @Value("${cameracheck.mediamtx.webrtc-port:8889}") int webrtcPort) {
+    public MediaMtxRelay(@Value("${cameracontrolplatform.mediamtx.api-port:9997}") int apiPort,
+            @Value("${cameracontrolplatform.mediamtx.webrtc-port:8889}") int webrtcPort) {
         this.apiPort = apiPort;
         this.webrtcPort = webrtcPort;
     }
